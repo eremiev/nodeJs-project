@@ -48,7 +48,7 @@ const app = express();
 /**
  * Connect to MongoDB.
  */
-mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URI_PROD, { useNewUrlParser: true });
 mongoose.connection.on('error', (err) => {
   console.error(err);
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
@@ -69,8 +69,8 @@ app.use(sass({
   dest: path.join(__dirname, 'public')
 }));
 app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json()); // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({ extended: true })); // to support URL-encoded bodies
 app.use(expressValidator());
 app.use(session({
   resave: true,
@@ -86,7 +86,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use((req, res, next) => {
-  if (req.path === '/api/upload') {
+  if (req.path === '/api/upload' || req.path === '/api/trader') {
     next();
   } else {
     lusca.csrf()(req, res, next);
@@ -151,6 +151,10 @@ app.get('/api/paypal/success', apiController.getPayPalSuccess);
 app.get('/api/paypal/cancel', apiController.getPayPalCancel);
 app.get('/api/upload', apiController.getFileUpload);
 app.post('/api/upload', upload.single('myFile'), apiController.postFileUpload);
+app.post('/api/trader', (req, res) => {
+  console.log(req.body);
+  res.status(200).send('ok');
+});
 
 /**
  * OAuth authentication routes. (Sign in)
