@@ -94,7 +94,20 @@ exports.postSignup = (req, res, next) => {
 
   const user = new User({
     email: req.body.email,
-    password: req.body.password
+    password: req.body.password,
+    profile: {
+      // name: 'test'
+    },
+    // robots: {
+    //   robot_id: '123',
+    //   broker: 'Admiral markets',
+    //   symbol: 'dax30',
+    //   profit: '21312'
+    // },
+    commission: {
+      value: 10,
+      chargeType: '%'
+    }
   });
 
   User.findOne({ email: req.body.email }, (err, existingUser) => {

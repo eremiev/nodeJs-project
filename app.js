@@ -33,6 +33,7 @@ dotenv.load({ path: '.env.example' });
 const homeController = require('./controllers/home');
 const userController = require('./controllers/user');
 const apiController = require('./controllers/api');
+const robotController = require('./controllers/robot');
 const contactController = require('./controllers/contact');
 
 /**
@@ -48,7 +49,7 @@ const app = express();
 /**
  * Connect to MongoDB.
  */
-mongoose.connect(process.env.MONGODB_URI_PROD, { useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 mongoose.connection.on('error', (err) => {
   console.error(err);
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
@@ -78,7 +79,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   cookie: { maxAge: 1209600000 }, // two weeks in milliseconds
   store: new MongoStore({
-    url: process.env.MONGODB_URI_PROD,
+    url: process.env.MONGODB_URI,
     autoReconnect: true,
   })
 }));
@@ -143,6 +144,11 @@ app.get('/account/unlink/:provider', passportConfig.isAuthenticated, userControl
 /**
  * API examples routes.
  */
+
+app.get('/api/robots', passportConfig.isAuthenticated, robotController.getRobots);
+app.post('/api/robots/create', passportConfig.isAuthenticated, robotController.postRobots);
+
+
 app.get('/api', apiController.getApi);
 app.get('/api/stripe', apiController.getStripe);
 app.post('/api/stripe', apiController.postStripe);
@@ -152,6 +158,10 @@ app.get('/api/paypal/cancel', apiController.getPayPalCancel);
 app.get('/api/upload', apiController.getFileUpload);
 app.post('/api/upload', upload.single('myFile'), apiController.postFileUpload);
 app.post('/api/trader', (req, res) => {
+  console.log(req.body);
+  res.status(200).send('ok');
+});
+app.post('/api/trader/:id', (req, res) => {
   console.log(req.body);
   res.status(200).send('ok');
 });

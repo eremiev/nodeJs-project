@@ -7,14 +7,6 @@ const userSchema = new mongoose.Schema({
   password: String,
   passwordResetToken: String,
   passwordResetExpires: Date,
-
-  facebook: String,
-  twitter: String,
-  google: String,
-  github: String,
-  instagram: String,
-  linkedin: String,
-  steam: String,
   tokens: Array,
 
   profile: {
@@ -23,8 +15,23 @@ const userSchema = new mongoose.Schema({
     location: String,
     website: String,
     picture: String
+  },
+  robots: [{
+    robot_id: String,
+    broker: String,
+    profit: String,
+    symbol: String,
+    mac: String,
+    ip: String,
+    last_active: Date,
+  }],
+
+  commission: {
+    value: Number,
+    chargeType: String
   }
-}, { timestamps: true });
+
+}, { timestamps: true, versionKey: false });
 
 /**
  * Password hash middleware.

@@ -76,40 +76,42 @@ block content
           | Delete my account
 
   .pb-2.mt-2.mb-4.border-bottom
-    h3 Linked Accounts
-  .form-group
-    .offset-sm-3.col-md-7.pl-2
-      if user.instagram
-        p.mb-1: a.text-danger(href='/account/unlink/instagram') Unlink your Instagram account
-      else
-        p.mb-1: a(href='/auth/instagram') Link your Instagram account
-    .offset-sm-3.col-md-7.pl-2
-      if user.google
-        p.mb-1: a.text-danger(href='/account/unlink/google') Unlink your Google account
-      else
-        p.mb-1: a(href='/auth/google') Link your Google account
-    .offset-sm-3.col-md-7.pl-2
-      if user.facebook
-        p.mb-1: a.text-danger(href='/account/unlink/facebook') Unlink your Facebook account
-      else
-        p.mb-1: a(href='/auth/facebook') Link your Facebook account
-    .offset-sm-3.col-md-7.pl-2
-      if user.twitter
-        p.mb-1: a.text-danger(href='/account/unlink/twitter') Unlink your Twitter account
-      else
-        p.mb-1: a(href='/auth/twitter') Link your Twitter account
-    .offset-sm-3.col-md-7.pl-2
-      if user.github
-        p.mb-1: a.text-danger(href='/account/unlink/github') Unlink your GitHub account
-      else
-        p.mb-1: a(href='/auth/github') Link your GitHub account
-    .offset-sm-3.col-md-7.pl-2
-      if user.linkedin
-        p.mb-1: a.text-danger(href='/account/unlink/linkedin') Unlink your LinkedIn account
-      else
-        p.mb-1: a(href='/auth/linkedin') Link your LinkedIn account
-    .offset-sm-3.col-md-7.pl-2
-      if user.steam
-        p.mb-1: a.text-danger(href='/account/unlink/steam') Unlink your Steam account
-      else
-        p.mb-1: a(href='/auth/steam') Link your Steam account
+    h3 Robots
+
+  button.btn.btn.btn-primary(data-toggle="modal" data-target="#myModal")
+    | Add Robot
+
+
+  .row
+      .col-lg-12
+         table.table.table-striped.table-hover
+            tr
+              th ID
+              th Broker
+            each val in user.robots
+              tr
+                  th= val.robot_id
+                  th= val.symbol
+
+  .modal.fade(role="dialog" id="myModal")
+    .modal-dialog
+      .modal-content
+        form(action='/api/robots/create', method='POST')
+          input(type='hidden', name='_csrf', value=_csrf)
+          .modal-header
+            h4.modal-title New Robot
+          .modal-body
+            .form-group.row
+              label.col-md-3.col-form-label.font-weight-bold.text-right(for='broker') Broker
+              .col-md-7
+                input.form-control(type='text', name='broker', id='broker')
+            .form-group.row
+              label.col-md-3.col-form-label.font-weight-bold.text-right(for='symbol') Instrument
+              .col-md-7
+                select.form-control(type='text', name='symbol', id='symbol')
+                    option(value='') Please chose one
+                    option(value='euro/usd') Euro/Usd
+                    option(value='dax30') DAX30
+          .modal-footer
+            button.btn.btn-default(type='button', data-dismiss="modal") Close
+            button.btn.btn-success(type='submit') Add
