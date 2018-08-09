@@ -19,7 +19,6 @@ exports.postRobots = (req, res, next) => {
   const { broker, symbol } = req.body;
   User.findById(req.user.id, (err, user) => {
     if (err) { return next(err); }
-    user.email = req.body.email || '';
     user.robots.push({
       robot_id: '123456',
       broker,
