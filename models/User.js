@@ -21,6 +21,7 @@ const userSchema = new mongoose.Schema({
     broker: String,
     profit: String,
     symbol: String,
+    account_number: Number,
     mac: String,
     ip: String,
     last_active: Date,

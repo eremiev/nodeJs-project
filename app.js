@@ -49,7 +49,7 @@ const app = express();
 /**
  * Connect to MongoDB.
  */
-mongoose.connect(process.env.MONGODB_URI_PROD, { useNewUrlParser: true });
+mongoose.connect(process.env.MONGODB_URI, { useNewUrlParser: true });
 mongoose.connection.on('error', (err) => {
   console.error(err);
   console.log('%s MongoDB connection error. Please make sure MongoDB is running.', chalk.red('✗'));
@@ -79,7 +79,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET,
   cookie: { maxAge: 1209600000 }, // two weeks in milliseconds
   store: new MongoStore({
-    url: process.env.MONGODB_URI_PROD,
+    url: process.env.MONGODB_URI,
     autoReconnect: true,
   })
 }));
@@ -157,14 +157,8 @@ app.get('/api/paypal/success', apiController.getPayPalSuccess);
 app.get('/api/paypal/cancel', apiController.getPayPalCancel);
 app.get('/api/upload', apiController.getFileUpload);
 app.post('/api/upload', upload.single('myFile'), apiController.postFileUpload);
-app.post('/api/trader', (req, res) => {
-  console.log(req.body);
-  res.status(200).send('ok');
-});
-app.post('/api/trader/:id', (req, res) => {
-  console.log(req.body);
-  res.status(200).send('ok');
-});
+app.get('/api/trader', robotController.postActions);
+
 
 /**
  * OAuth authentication routes. (Sign in)
