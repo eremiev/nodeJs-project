@@ -5,7 +5,8 @@ const robotActionSchema = new mongoose.Schema({
   action: String,
   robot_id: Number,
   order: Number,
-}, { timestamps: true, versionKey: false });
+  createdAt: Date
+}, { versionKey: false });
 
 const RobotAction = mongoose.model('robot_actions', robotActionSchema);
 

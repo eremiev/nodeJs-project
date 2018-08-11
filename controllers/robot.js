@@ -1,5 +1,6 @@
 const User = require('../models/User');
 const RobotAction = require('../models/RobotAction');
+const Robot = require('../models/Robot');
 
 
 /**
@@ -16,33 +17,67 @@ exports.getRobots = (req, res) => {
  * POST /api/robots/create
  * Store new robot.
  */
-exports.postRobots = (req, res, next) => {
+exports.postRobots = async (req, res, next) => {
   const { broker, symbol } = req.body;
+  const robot = new Robot();
+  robot.symbol = symbol;
+  robot.broker = broker;
   User.findById(req.user.id, (err, user) => {
     if (err) { return next(err); }
-    user.robots.push({
-      robot_id: '123456',
-      account_number: null,
-      broker,
-      profit: null,
-      mac: null,
-      ip: null,
-      symbol,
-      last_active: Date.now()
-    });
-
-    user.save((err) => {
-      if (err) {
-        if (err.code === 11000) {
-          req.flash('errors', { msg: 'Error!' });
-          return res.redirect('/account');
-        }
-        return next(err);
-      }
-      req.flash('success', { msg: 'Profile information has been updated.' });
-      res.redirect('/account');
-    });
+    storeRobot(user, robot);
+    req.flash('success', { msg: 'Your Robot has been stored!' });
+    res.redirect('/account');
   });
+};
+
+
+/**
+ * PUT /api/robots/:robot_id
+ * Update info of robot.
+ */
+exports.putRobots = (req, res, next) => {
+  const { broker, symbol } = req.body;
+  const robot = new Robot();
+  robot.symbol = symbol;
+  robot.broker = broker;
+  User.findById(req.user.id, (err, user) => {
+    if (err) { return next(err); }
+    storeRobot(user, robot);
+    req.flash('success', { msg: 'Your Robot has been stored!' });
+    res.redirect('/account');
+  });
+};
+
+
+/**
+ * DELETE /api/robots/:id
+ * Delete new robot.
+ */
+exports.removeRobots = (req, res, next) => {
+  const { robot_id } = req.params;
+  User.findById(req.user.id, (err, user) => {
+      if (err) { return next(err); }
+      if (user) {
+          user.robots.forEach( (robot) => {
+            if(robot.robot_id == robot_id){
+              user.robots.pull({ _id: robot.id })
+            }
+          });
+          user.save((err) => {
+              if (err) {
+                if (err.code === 11000) {
+                  req.flash('errors', { msg: 'Error!' });
+                  return res.redirect('/account');
+                }
+                return next(err);
+              }
+          });
+   
+      req.flash('success', { msg: 'Your Robot has been removed!' });
+      res.redirect('/account');
+      }
+  });
+   
 };
 
 /**
@@ -70,6 +105,7 @@ exports.postActions = (req, res, next) => {
       action.action = messageObj.action;
       action.order = messageObj.order;
       action.robot_id = messageObj.id;
+      action.createdAt = Date.now();
 
       action.save((err) => {
         if (err) {
@@ -80,6 +116,47 @@ exports.postActions = (req, res, next) => {
         }
         res.status(200).send('ok');
       });
+    }else{
+      res.status(400).send('Your robot is not verified!');
     }
   });
 };
+
+
+async function storeRobot(user, robot) {
+
+   let random = 0;
+   do {
+      random = Math.floor((Math.random() * 999999) + 1);
+   } while (await checkInDb(random));
+
+   robot.robot_id = random;
+   // robot.last_active = Date.now();
+   user.robots.push(robot);
+
+    user.save((err) => {
+      if (err) {
+        if (err.code === 11000) {
+          req.flash('errors', { msg: 'Error!' });
+          return res.redirect('/account');
+        }
+        return next(err);
+      }
+
+    });
+
+}
+
+
+async function checkInDb(id) {
+    try {
+        let idFound = await User.findOne({ 'robots.robot_id': id });
+        if (idFound) return true;
+        else return false;
+    }
+    catch (err) {
+        console.log(err);
+        return false;
+    }
+
+}

@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt-nodejs');
 const crypto = require('crypto');
 const mongoose = require('mongoose');
+const Robot = require('../models/Robot');
 
 const userSchema = new mongoose.Schema({
   email: { type: String, unique: true },
@@ -8,7 +9,6 @@ const userSchema = new mongoose.Schema({
   passwordResetToken: String,
   passwordResetExpires: Date,
   tokens: Array,
-
   profile: {
     name: String,
     gender: String,
@@ -16,17 +16,7 @@ const userSchema = new mongoose.Schema({
     website: String,
     picture: String
   },
-  robots: [{
-    robot_id: String,
-    broker: String,
-    profit: String,
-    symbol: String,
-    account_number: Number,
-    mac: String,
-    ip: String,
-    last_active: Date,
-  }],
-
+  robots: [Robot.schema],
   commission: {
     value: Number,
     chargeType: String
