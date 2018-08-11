@@ -36,15 +36,37 @@ exports.postRobots = async (req, res, next) => {
  * Update info of robot.
  */
 exports.putRobots = (req, res, next) => {
-  const { broker, symbol } = req.body;
-  const robot = new Robot();
-  robot.symbol = symbol;
-  robot.broker = broker;
-  User.findById(req.user.id, (err, user) => {
+  // const { message } = req.body;
+  const message = 'id:995437,action:sell,order:2,type:dax30';
+  const messagePreparationArray = message.split(',');
+  const messageObj = {};
+  messagePreparationArray.forEach((element) => {
+    const needle = element.indexOf(':');
+    const key = element.substring(0, needle);
+    const value = element.substring(needle + 1);
+    messageObj[key] = value;
+  });
+  console.log(messageObj);
+
+  User.findOne({ 'robots.robot_id': messageObj.id }, (err, user) => {
     if (err) { return next(err); }
-    storeRobot(user, robot);
-    req.flash('success', { msg: 'Your Robot has been stored!' });
-    res.redirect('/account');
+    if (user) {
+      user.robots.forEach( (robot) => {
+        if(robot.robot_id == messageObj.id){
+          user.robots.pull({ _id: robot.id })
+          robot.last_active = Date.now();
+          user.robots.push(robot);
+
+          user.save((err) => {
+            if (err) { return next(err); }
+          });
+
+          // TODO check robot info and send command!
+
+          res.status(200).send('ok');
+        }
+      });
+    }
   });
 };
 
