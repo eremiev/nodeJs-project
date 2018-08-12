@@ -55,12 +55,14 @@ block content
          table.table.table-striped.table-hover.text-center
             tr
               th ID
+              th Account
               th Instrument
               th Broker
               th Actions
             each val in user.robots
               tr
                   th= val.robot_id
+                  th= val.account_number
                   th= val.symbol
                   th= val.broker
                   th
@@ -114,6 +116,10 @@ block content
           .modal-header
             h4.modal-title New Robot
           .modal-body
+            .form-group.row
+              label.col-md-3.col-form-label.font-weight-bold.text-right(for='account_number') Account
+              .col-md-7
+                input.form-control(type='text', name='account_number', id='account_number')
             .form-group.row
               label.col-md-3.col-form-label.font-weight-bold.text-right(for='broker') Broker
               .col-md-7
