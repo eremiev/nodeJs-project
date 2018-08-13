@@ -46,6 +46,15 @@ async function storeRobot(user, robot) {
  */
 exports.postRobots = async (req, res, next) => {
   const { broker, symbol, accountNumber } = req.body;
+  req.assert('broker', 'Broker cannot be blank').notEmpty();
+  req.assert('symbol', 'Symbol cannot be blank').notEmpty();
+  req.assert('accountNumber', 'Account cannot be blank').notEmpty();
+  const errors = req.validationErrors();
+
+  if (errors) {
+    req.flash('errors', errors);
+    return res.redirect('/account');
+  }
   const robot = new Robot();
   robot.symbol = symbol;
   robot.broker = broker;
