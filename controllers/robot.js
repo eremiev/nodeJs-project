@@ -173,15 +173,17 @@ exports.removeRobots = (req, res, next) => {
  * Store new robot actions.
  */
 exports.postActions = (req, res, next) => {
-  const { message2 } = req.body;
-  console.log(message2);
-  const message = 'id:12345,action:sell,order:2,type:euro/usd';
+  const { message } = req.body;
   const messagePreparationArray = message.split(',');
   const messageObj = {};
   messagePreparationArray.forEach((element) => {
     const needle = element.indexOf(':');
     const key = element.substring(0, needle);
     const value = element.substring(needle + 1);
+    if(key === 'type'){
+        value = value.slice(1);
+        value = value.slice(0, -1);
+    }
     messageObj[key] = value;
   });
   console.log(messageObj);
