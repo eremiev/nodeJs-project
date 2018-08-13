@@ -91,7 +91,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use((req, res, next) => {
-  if (req.path === '/api/upload' || req.path === '/api/trader' || req.path.substr(0, 11) === '/api/robots') {
+  if (req.path === '/api/upload' || req.path === '/api/trader' || req.path === '/api/robots') {
     next();
   } else {
     lusca.csrf()(req, res, next);
@@ -150,7 +150,7 @@ app.post('/account/delete', passportConfig.isAuthenticated, userController.postD
  */
 
 app.post('/api/trader', robotController.postActions);
-app.put('/api/robots/:robotId', robotController.putRobots);
+app.put('/api/robots', robotController.putRobots);
 app.get('/api/robots', passportConfig.isAuthenticated, robotController.getRobots);
 app.post('/api/robots/create', passportConfig.isAuthenticated, robotController.postRobots);
 app.delete('/api/robots/:robotId', passportConfig.isAuthenticated, robotController.removeRobots);
