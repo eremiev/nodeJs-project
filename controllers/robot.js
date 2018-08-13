@@ -131,7 +131,7 @@ exports.removeRobots = (req, res, next) => {
     if (err) { return next(err); }
     if (user) {
       user.robots.forEach((robot) => {
-        if (robot.robot_id === robotId) {
+        if (robot.robot_id === parseInt(robotId)) {
           user.robots.pull({ _id: robot.id });
         }
       });
