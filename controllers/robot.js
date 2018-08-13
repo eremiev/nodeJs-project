@@ -65,6 +65,8 @@ exports.postRobots = async (req, res, next) => {
  */
 exports.putRobots = (req, res, next) => {
   const { robotId } = req.params;
+  const { message2 } = req.body;
+  console.log(message2);
   let message = 'account_id:123466,broker:AM,open_orders:2,id:';
   message += robotId;
   const messagePreparationArray = message.split(',');
@@ -156,7 +158,8 @@ exports.removeRobots = (req, res, next) => {
  * Store new robot actions.
  */
 exports.postActions = (req, res, next) => {
-  // const { message } = req.body;
+  const { message2 } = req.body;
+  console.log(message2);
   const message = 'id:12345,action:sell,order:2,type:euro/usd';
   const messagePreparationArray = message.split(',');
   const messageObj = {};
