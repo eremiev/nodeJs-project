@@ -179,7 +179,7 @@ exports.postActions = (req, res, next) => {
   messagePreparationArray.forEach((element) => {
     const needle = element.indexOf(':');
     const key = element.substring(0, needle);
-    const value = element.substring(needle + 1);
+    let value = element.substring(needle + 1);
     if(key === 'type'){
         value = value.slice(1);
         value = value.slice(0, -1);
