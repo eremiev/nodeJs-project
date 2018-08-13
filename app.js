@@ -91,7 +91,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash());
 app.use((req, res, next) => {
-  if (req.path === '/api/upload' || req.path === '/api/trader' || req.path === '/api/robots/995437') {
+  if (req.path === '/api/upload' || req.path === '/api/trader' || req.path === '/api/robots/*') {
     next();
   } else {
     lusca.csrf()(req, res, next);
