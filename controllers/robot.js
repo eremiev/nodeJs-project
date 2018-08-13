@@ -26,9 +26,9 @@ async function checkInDb(id) {
 }
 
 async function storeRobot(user, robot) {
-  let random = 0;
+  let random = '0';
   do {
-    random = Math.floor((Math.random() * 999999) + 1);
+    random = Math.floor((Math.random() * 999999) + 1).toString();
   } while (await checkInDb(random));
 
   robot.robot_id = random;
@@ -64,8 +64,9 @@ exports.postRobots = async (req, res, next) => {
  * Update info of robot.
  */
 exports.putRobots = (req, res, next) => {
-  // const { message } = req.body;
-  const message = 'id:533174,account_id:27009650,broker:AM,open_orders:2';
+  const { robotId } = req.params;
+  let message = 'account_id:123466,broker:AM,open_orders:2,id:';
+  message += robotId;
   const messagePreparationArray = message.split(',');
   const messageObj = {};
   messagePreparationArray.forEach((element) => {
@@ -81,8 +82,8 @@ exports.putRobots = (req, res, next) => {
     if (err) { return next(err); }
     if (user) {
       user.robots.forEach(async (robot) => {
-        if (robot.robot_id == messageObj.id && robot.account_number == messageObj.account_id){
-          user.robots.pull({ _id: robot.id })
+        if (robot.robot_id === messageObj.id && robot.account_number === messageObj.account_id) {
+          user.robots.pull({ _id: robot.id });
           robot.last_active = Date.now();
           user.robots.push(robot);
           user.save((err) => { if (err) { return next(err); } });
@@ -94,7 +95,7 @@ exports.putRobots = (req, res, next) => {
                 const actionTime = moment(liveRobot.pending_time);
                 const now = moment(Date.now());
                 const secondsDiff = now.diff(actionTime, 'seconds');
-                if (secondsDiff <= process.env.SEND_ACTION_LIMIT_TIME){
+                if (secondsDiff <= process.env.SEND_ACTION_LIMIT_TIME) {
                   action = liveRobot.pending_action;
                 } else {
                   action = 'Late for action!';
@@ -111,12 +112,11 @@ exports.putRobots = (req, res, next) => {
             }
           });
           res.status(200).send(action);
-        } else {
-          res.status(404);
         }
       });
+    } else {
+      res.status(200).send('Not found Robot!');
     }
-    res.status(404);
   });
 };
 
@@ -132,7 +132,7 @@ exports.removeRobots = (req, res, next) => {
     if (err) { return next(err); }
     if (user) {
       user.robots.forEach((robot) => {
-        if (robot.robot_id == robotId) {
+        if (robot.robot_id === robotId) {
           user.robots.pull({ _id: robot.id });
         }
       });
