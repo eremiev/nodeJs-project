@@ -75,17 +75,18 @@ exports.postRobots = async (req, res, next) => {
  * Update info of robot.
  */
 exports.putRobots = (req, res, next) => {
-  const { robotId } = req.params;
-  const { message2 } = req.body;
-  console.log(message2);
-  let message = 'account_id:123466,broker:AM,open_orders:2,id:';
-  message += robotId;
+  const { message } = req.body;
+  console.log(message);
   const messagePreparationArray = message.split(',');
   const messageObj = {};
   messagePreparationArray.forEach((element) => {
     const needle = element.indexOf(':');
     const key = element.substring(0, needle);
-    const value = element.substring(needle + 1);
+    let value = element.substring(needle + 1);
+    if(key === 'type'){
+        value = value.slice(1);
+        value = value.slice(0, -1);
+    }
     messageObj[key] = value;
   });
   console.log(messageObj);
@@ -179,7 +180,7 @@ exports.postActions = (req, res, next) => {
   messagePreparationArray.forEach((element) => {
     const needle = element.indexOf(':');
     const key = element.substring(0, needle);
-    const value = element.substring(needle + 1);
+    let value = element.substring(needle + 1);
     if(key === 'type'){
         value = value.slice(1);
         value = value.slice(0, -1);
