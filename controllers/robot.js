@@ -84,36 +84,40 @@ exports.putRobots = (req, res, next) => {
     if (err) { return next(err); }
     if (user) {
       user.robots.forEach(async (robot) => {
-        if (robot.robot_id === messageObj.id && robot.account_number === messageObj.account_id) {
-          user.robots.pull({ _id: robot.id });
-          robot.last_active = Date.now();
-          user.robots.push(robot);
-          user.save((err) => { if (err) { return next(err); } });
+        if (robot.robot_id === messageObj.id) {
+          if (robot.account_number === messageObj.account_id) {
+            user.robots.pull({ _id: robot.id });
+            robot.last_active = Date.now();
+            user.robots.push(robot);
+            user.save((err) => { if (err) { return next(err); } });
 
-          await Live.findOne({ robot_id: robot.robot_id }, (err, liveRobot) => {
-            if (err) { return next(err); }
-            if (liveRobot) {
-              if (liveRobot.pending_action) {
-                const actionTime = moment(liveRobot.pending_time);
-                const now = moment(Date.now());
-                const secondsDiff = now.diff(actionTime, 'seconds');
-                if (secondsDiff <= process.env.SEND_ACTION_LIMIT_TIME) {
-                  action = liveRobot.pending_action;
-                } else {
-                  action = 'Late for action!';
+            await Live.findOne({ robot_id: robot.robot_id }, (err, liveRobot) => {
+              if (err) { return next(err); }
+              if (liveRobot) {
+                if (liveRobot.pending_action) {
+                  const actionTime = moment(liveRobot.pending_time);
+                  const now = moment(Date.now());
+                  const secondsDiff = now.diff(actionTime, 'seconds');
+                  if (secondsDiff <= process.env.SEND_ACTION_LIMIT_TIME) {
+                    action = liveRobot.pending_action;
+                  } else {
+                    action = 'Late for action!';
+                  }
+                  liveRobot.pending_action = null;
+                  liveRobot.pending_time = null;
+                  liveRobot.save((err) => { if (err) { return next(err); } });
                 }
-                liveRobot.pending_action = null;
-                liveRobot.pending_time = null;
-                liveRobot.save((err) => { if (err) { return next(err); } });
+              } else {
+                const live = new Live();
+                live.robot_id = robot.robot_id;
+                live.symbol = robot.symbol;
+                live.save((err) => { if (err) { return next(err); } });
               }
-            } else {
-              const live = new Live();
-              live.robot_id = robot.robot_id;
-              live.symbol = robot.symbol;
-              live.save((err) => { if (err) { return next(err); } });
-            }
-          });
-          res.status(200).send(action);
+            });
+            res.status(200).send(action);
+          } else {
+            res.status(200).send('Account is not correct!');
+          }
         }
       });
     } else {
