@@ -153,7 +153,7 @@ app.post('/api/trader', robotController.postActions);
 app.put('/api/robots/:robot_id', robotController.putRobots);
 app.get('/api/robots', passportConfig.isAuthenticated, robotController.getRobots);
 app.post('/api/robots/create', passportConfig.isAuthenticated, robotController.postRobots);
-app.delete('/api/robots/:robot_id', passportConfig.isAuthenticated, robotController.removeRobots);
+app.delete('/api/robots/:robotId', passportConfig.isAuthenticated, robotController.removeRobots);
 
 
 // app.get('/api', apiController.getApi);

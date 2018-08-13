@@ -127,11 +127,12 @@ exports.putRobots = (req, res, next) => {
  */
 exports.removeRobots = (req, res, next) => {
   const { robotId } = req.params;
+  console.log(robotId);
   User.findById(req.user.id, (err, user) => {
     if (err) { return next(err); }
     if (user) {
       user.robots.forEach((robot) => {
-        if (robot.robot_id === parseInt(robotId)) {
+        if (robot.robot_id == robotId) {
           user.robots.pull({ _id: robot.id });
         }
       });
