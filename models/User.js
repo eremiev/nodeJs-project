@@ -20,7 +20,8 @@ const userSchema = new mongoose.Schema({
   commission: {
     value: Number,
     chargeType: String
-  }
+  },
+  role: Array
 
 }, { timestamps: true, versionKey: false });
 

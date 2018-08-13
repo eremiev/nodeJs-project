@@ -55,16 +55,18 @@ exports.postRobots = async (req, res, next) => {
     req.flash('errors', errors);
     return res.redirect('/account');
   }
+
   const robot = new Robot();
   robot.symbol = symbol;
   robot.broker = broker;
   robot.account_number = accountNumber;
-  User.findById(req.user.id, (err, user) => {
+  await User.findById(req.user.id, (err, user) => {
     if (err) { return next(err); }
     storeRobot(user, robot);
-    req.flash('success', { msg: 'Your Robot has been stored!' });
-    res.redirect('/account');
   });
+
+  req.flash('success', { msg: 'Your Robot has been stored!' });
+  res.redirect('/account');
 };
 
 
