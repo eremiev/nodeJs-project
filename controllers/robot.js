@@ -74,7 +74,7 @@ exports.postRobots = async (req, res, next) => {
  * PUT /api/robots/:robot_id
  * Update info of robot.
  */
-exports.putRobots = (req, res, next) => {
+exports.putRobots = async (req, res, next) => {
   const { message } = req.body;
   console.log(message);
   const messagePreparationArray = message.split(',');
