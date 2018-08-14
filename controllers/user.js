@@ -192,7 +192,7 @@ exports.postUpdatePassword = (req, res, next) => {
           res.redirect('/account');
         });
       } else {
-        req.flash('info', { msg: 'Old password not match!' });
+        req.flash('errors', { msg: 'Old password not match!' });
         res.redirect('/account');
       }
     });
