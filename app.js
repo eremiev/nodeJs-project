@@ -150,7 +150,7 @@ app.post('/account/delete', passportConfig.isAuthenticated, userController.postD
  */
 
 app.post('/api/trader', robotController.postActions);
-app.put('/api/robots', robotController.putRobots);
+app.post('/api/robots', robotController.putRobots);
 app.get('/api/robots', passportConfig.isAuthenticated, robotController.getRobots);
 app.post('/api/robots/create', passportConfig.isAuthenticated, robotController.postRobots);
 app.delete('/api/robots/:robotId', passportConfig.isAuthenticated, robotController.removeRobots);
