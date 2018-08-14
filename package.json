@@ -1,13 +1,13 @@
 {
-  "name": "hackathon-starter",
+  "name": "trader-bg",
   "version": "5.1.1",
-  "description": "A boilerplate for Node.js web applications",
+  "description": "",
   "repository": {
     "type": "git",
-    "url": "https://github.com/sahat/hackathon-starter.git"
+    "url": ""
   },
-  "author": "Sahat Yalkabov",
-  "license": "MIT",
+  "author": "",
+  "license": "",
   "scripts": {
     "postinstall": "npm rebuild node-sass",
     "start": "node app.js",
