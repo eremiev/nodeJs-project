@@ -32,9 +32,8 @@ const userSchema = new mongoose.Schema({
  */
 userSchema.pre('save', function save(next) {
   const user = this;
-  if (user.isNew) {
+  if (user.robots.length === 0) {
     user.robots = undefined;
-    user.tokens = undefined;
   }
   if (!user.isModified('password')) { return next(); }
   bcrypt.genSalt(10, (err, salt) => {
