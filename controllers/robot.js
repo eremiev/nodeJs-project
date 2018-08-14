@@ -154,6 +154,9 @@ exports.removeRobots = (req, res, next) => {
           user.robots.pull({ _id: robot.id });
         }
       });
+      if (user.robots.length === 0) {
+        user.robots = undefined;
+      }
       user.save((err) => {
         if (err) {
           if (err.code === 11000) {

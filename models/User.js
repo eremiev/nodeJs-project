@@ -4,6 +4,8 @@ const mongoose = require('mongoose');
 const Robot = require('../models/Robot');
 
 const userSchema = new mongoose.Schema({
+  active: { type: Boolean, default: false },
+  activate_token: String,
   email: { type: String, unique: true },
   password: String,
   passwordResetToken: String,
@@ -30,6 +32,10 @@ const userSchema = new mongoose.Schema({
  */
 userSchema.pre('save', function save(next) {
   const user = this;
+  if (user.isNew) {
+    user.robots = undefined;
+    user.tokens = undefined;
+  }
   if (!user.isModified('password')) { return next(); }
   bcrypt.genSalt(10, (err, salt) => {
     if (err) { return next(err); }

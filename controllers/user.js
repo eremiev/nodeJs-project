@@ -99,6 +99,7 @@ exports.postSignup = (req, res, next) => {
       value: 10,
       chargeType: '%'
     },
+    activate_token: crypto.randomBytes(16).toString('hex'),
     role: ['trader']
   });
 
@@ -250,6 +251,27 @@ exports.getReset = (req, res, next) => {
       res.render('account/reset', {
         title: 'Password Reset'
       });
+    });
+};
+
+/**
+ * GET /activate/:token
+ * Reset Password page.
+ */
+exports.getActivate = async (req, res, next) => {
+  User.findOne({ activate_token: req.params.token })
+    .exec((err, user) => {
+      if (err) { return next(err); }
+      if (user) {
+        user.activate_token = undefined;
+        user.active = true;
+        user.save((err) => { if (err) { return next(err); } });
+        req.logIn(user, (err) => {
+          if (err) { return next(err); }
+          req.flash('success', { msg: 'Success! Your account is activated!' });
+          res.redirect('/');
+        });
+      }
     });
 };
 

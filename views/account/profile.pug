@@ -59,19 +59,21 @@ block content
               th Instrument
               th Broker
               th Actions
-            each val in user.robots
-              tr
-                  th= val.robot_id
-                  th= val.account_number
-                  th= val.symbol
-                  th= val.broker
-                  th
-                     form(action='/api/robots/' + val.robot_id + '?_method=DELETE', method='POST', onsubmit="return confirm('Are you sure you want to delete your account?');")
-                      .form-group
-                        input(type='hidden', name='_csrf', value=_csrf)
-                        button.btn.btn-danger(type='submit')
-                          i.fas.fa-trash-alt.fa-sm
-                            |  Delete
+
+            if user.robots
+                each val in user.robots
+                  tr
+                      th= val.robot_id
+                      th= val.account_number
+                      th= val.symbol
+                      th= val.broker
+                      th
+                         form(action='/api/robots/' + val.robot_id + '?_method=DELETE', method='POST', onsubmit="return confirm('Are you sure you want to delete your account?');")
+                          .form-group
+                            input(type='hidden', name='_csrf', value=_csrf)
+                            button.btn.btn-danger(type='submit')
+                              i.fas.fa-trash-alt.fa-sm
+                                |  Delete
 
 
   .pb-2.mt-2.mb-4.border-bottom
