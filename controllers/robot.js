@@ -191,15 +191,17 @@ exports.postActions = (req, res, next) => {
       action.robot_id = messageObj.id;
       action.createdAt = Date.now();
 
-      Live.update({ symbol: messageObj.type },
-        {
-          pending_action: messageObj.action,
-          pending_time: Date.now()
-        },
-        { multi: true },
-        (err) => {
-          if (err) { return next(err); }
+      Live.find({ symbol: messageObj.type }).then( (lives) =>{
+        lives.forEach( (live) => {
+            if(live.pending_action){
+              live.pending_action = messageObj.action + '|' + live.pending_action;
+            } else {
+              live.pending_action = messageObj.action;
+            }
+            live.pending_time = Date.now();
+            live.save((err) => { if (err) { return next(err); } });
         });
+      });
 
       action.save((err) => {
         if (err) { return next(err); }
