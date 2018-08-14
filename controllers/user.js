@@ -265,6 +265,9 @@ exports.getActivate = async (req, res, next) => {
       if (user) {
         user.activate_token = undefined;
         user.active = true;
+        if (user.robots.length === 0) {
+          user.robots = undefined;
+        }
         user.save((err) => { if (err) { return next(err); } });
         req.logIn(user, (err) => {
           if (err) { return next(err); }
