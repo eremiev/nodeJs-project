@@ -183,11 +183,18 @@ exports.postUpdatePassword = (req, res, next) => {
 
   User.findById(req.user.id, (err, user) => {
     if (err) { return next(err); }
-    user.password = req.body.password;
-    user.save((err) => {
-      if (err) { return next(err); }
-      req.flash('success', { msg: 'Password has been changed.' });
-      res.redirect('/account');
+    user.comparePassword(req.body.oldPassword, (err, isMatch) => {
+      if (isMatch) {
+        user.password = req.body.password;
+        user.save((err) => {
+          if (err) { return next(err); }
+          req.flash('success', { msg: 'Password has been changed.' });
+          res.redirect('/account');
+        });
+      } else {
+        req.flash('info', { msg: 'Old password not match!' });
+        res.redirect('/account');
+      }
     });
   });
 };
