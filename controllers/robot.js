@@ -82,11 +82,7 @@ exports.putRobots = (req, res, next) => {
   messagePreparationArray.forEach((element) => {
     const needle = element.indexOf(':');
     const key = element.substring(0, needle);
-    let value = element.substring(needle + 1);
-    if (key === 'type' && value.charAt(0) === '[') {
-      value = value.slice(1);
-      value = value.slice(0, -1);
-    }
+    const value = element.substring(needle + 1);
     messageObj[key] = value;
   });
   console.log(messageObj);
@@ -180,11 +176,7 @@ exports.postActions = (req, res, next) => {
   messagePreparationArray.forEach((element) => {
     const needle = element.indexOf(':');
     const key = element.substring(0, needle);
-    let value = element.substring(needle + 1);
-    if (key === 'type' && value.charAt(0) === '[') {
-      value = value.slice(1);
-      value = value.slice(0, -1);
-    }
+    const value = element.substring(needle + 1);
     messageObj[key] = value;
   });
   console.log(messageObj);
