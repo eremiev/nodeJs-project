@@ -83,9 +83,9 @@ exports.putRobots = (req, res, next) => {
     const needle = element.indexOf(':');
     const key = element.substring(0, needle);
     let value = element.substring(needle + 1);
-    if(key === 'type'){
-        value = value.slice(1);
-        value = value.slice(0, -1);
+    if (key === 'type' && value.charAt(0) === '[') {
+      value = value.slice(1);
+      value = value.slice(0, -1);
     }
     messageObj[key] = value;
   });
@@ -181,9 +181,9 @@ exports.postActions = (req, res, next) => {
     const needle = element.indexOf(':');
     const key = element.substring(0, needle);
     let value = element.substring(needle + 1);
-    if(key === 'type'){
-        value = value.slice(1);
-        value = value.slice(0, -1);
+    if (key === 'type' && value.charAt(0) === '[') {
+      value = value.slice(1);
+      value = value.slice(0, -1);
     }
     messageObj[key] = value;
   });
@@ -218,4 +218,3 @@ exports.postActions = (req, res, next) => {
     }
   });
 };
-
