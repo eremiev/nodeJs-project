@@ -99,7 +99,7 @@ exports.putRobots = async (req, res, next) => {
             // user.robots.push(robot);
             // user.save((err) => { if (err) { return next(err); } });
 
-            user.update({'robots.robot_id': robot.id }, { '$set': { 'robots.$.last_active': Date.now() }},  (err) =>{
+            user.update({'robots.robot_id': robot.id }, { $set: { 'robots.$.last_active': Date.now() }},  (err) =>{
               console.log(err);
             });
 
