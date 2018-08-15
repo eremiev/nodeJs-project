@@ -127,7 +127,7 @@ exports.putRobots = async (req, res, next) => {
               }
             });
             res.status(200).send(action);
-            user.save((err) => { if (err) { return next(err); } });
+            user.save();
           } else {
             res.status(200).send('Account is not correct!');
           }
