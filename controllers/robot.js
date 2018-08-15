@@ -102,7 +102,7 @@ exports.putRobots = async (req, res, next) => {
             //   console.log(err);
             // });
 
-            user.save((err) => { if (err) { return next(err); } });
+            
             await Live.findOne({ robot_id: robot.robot_id }, (err, liveRobot) => {
               if (err) { return next(err); }
               if (liveRobot) {
@@ -126,6 +126,7 @@ exports.putRobots = async (req, res, next) => {
                 live.save((err) => { if (err) { return next(err); } });
               }
             });
+            user.save((err) => { if (err) { return next(err); } });
             res.status(200).send(action);
           } else {
             res.status(200).send('Account is not correct!');
@@ -133,7 +134,7 @@ exports.putRobots = async (req, res, next) => {
         }
       });
 
-      
+
     } else {
       res.status(200).send('Not found Robot!');
     }
