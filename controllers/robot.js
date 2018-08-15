@@ -94,14 +94,13 @@ exports.putRobots = async (req, res, next) => {
       user.robots.forEach(async (robot) => {
         if (robot.robot_id === messageObj.id) {
           if (robot.account_number === messageObj.account_id) {
-            // user.robots.pull({ _id: robot.id });
-            // robot.last_active = Date.now();
-            // user.robots.push(robot);
-            // user.save((err) => { if (err) { return next(err); } });
+            user.robots.pull({ _id: robot.id });
+            robot.last_active = Date.now();
+            user.robots.push(robot);
 
-            user.update({'robots.robot_id': robot.id }, { $set: { 'robots.$.last_active': Date.now() }},  (err) =>{
-              console.log(err);
-            });
+            // user.update({'robots.robot_id': robot.id }, { '$set': { 'robots.$.last_active': Date.now() }},  (err) =>{
+            //   console.log(err);
+            // });
 
             await Live.findOne({ robot_id: robot.robot_id }, (err, liveRobot) => {
               if (err) { return next(err); }
@@ -132,6 +131,9 @@ exports.putRobots = async (req, res, next) => {
           }
         }
       });
+
+      
+            user.save((err) => { if (err) { return next(err); } });
     } else {
       res.status(200).send('Not found Robot!');
     }
