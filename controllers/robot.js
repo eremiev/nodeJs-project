@@ -126,13 +126,13 @@ exports.putRobots = async (req, res, next) => {
                 live.save((err) => { if (err) { return next(err); } });
               }
             });
-            res.status(200);
-            user.save((err) => { if (err) { return next(err); } });
-            res.send(action);
+            res.status(200).send(action);
           } else {
             res.status(200).send('Account is not correct!');
           }
         }
+        
+      user.save((err) => { if (err) { return next(err); } });
       });
 
 
