@@ -102,6 +102,7 @@ exports.putRobots = async (req, res, next) => {
             //   console.log(err);
             // });
 
+            user.save((err) => { if (err) { return next(err); } });
             await Live.findOne({ robot_id: robot.robot_id }, (err, liveRobot) => {
               if (err) { return next(err); }
               if (liveRobot) {
@@ -133,7 +134,6 @@ exports.putRobots = async (req, res, next) => {
       });
 
       
-            user.save((err) => { if (err) { return next(err); } });
     } else {
       res.status(200).send('Not found Robot!');
     }
