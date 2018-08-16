@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const passport = require('passport');
 const User = require('../models/User');
+const Robot = require('../models/Robot');
 
 const randomBytesAsync = promisify(crypto.randomBytes);
 
@@ -125,9 +126,15 @@ exports.postSignup = (req, res, next) => {
  * GET /account
  * Profile page.
  */
-exports.getAccount = (req, res) => {
+exports.getAccount = async (req, res) => {
+  let robots = null;
+  await Robot.find({ user: req.user.id }, (err, userRobots) => {
+    robots = userRobots;
+  });
+
   res.render('account/profile', {
-    title: 'Account Management'
+    title: 'Account Management',
+    robots
   });
 };
 

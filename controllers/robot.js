@@ -17,7 +17,7 @@ exports.getRobots = (req, res) => {
 
 async function checkInDb(id) {
   try {
-    const idFound = await User.findOne({ 'robots.robot_id': id });
+    const idFound = await Robot.findOne({ robot_id: id });
     if (idFound) return true;
     return false;
   } catch (err) {
@@ -26,19 +26,14 @@ async function checkInDb(id) {
   }
 }
 
-async function storeRobot(user, robot) {
+async function storeRobot(robot) {
   let random = '0';
   do {
     random = Math.floor((Math.random() * 999999) + 1).toString();
   } while (await checkInDb(random));
 
   robot.robot_id = random;
-  // robot.last_active = Date.now();
-  user.robots.push(robot);
-
-  user.save((err) => {
-    if (err) { console.log(err); }
-  });
+  robot.save((err) => { if (err) { console.log(err); } });
 }
 
 /**
@@ -57,13 +52,17 @@ exports.postRobots = async (req, res, next) => {
     return res.redirect('/account');
   }
 
-  const robot = new Robot();
-  robot.symbol = symbol;
-  robot.broker = broker;
-  robot.account_number = accountNumber;
   await User.findById(req.user.id, (err, user) => {
     if (err) { return next(err); }
-    storeRobot(user, robot);
+    if (user) {
+      const robot = new Robot();
+      robot.symbol = symbol;
+      robot.broker = broker;
+      robot.account_number = accountNumber;
+      robot.user = req.user.id;
+      robot.last_active = Date.now();
+      storeRobot(robot);
+    }
   });
 
   req.flash('success', { msg: 'Your Robot has been stored!' });
@@ -90,60 +89,56 @@ exports.putRobots = async (req, res, next) => {
   console.log(messageObj);
   let action = 'ok';
 
-  await User.findOne({ 'robots.robot_id': messageObj.id }, (err, user) => {
+  Robot.findOne({ robot_id: messageObj.id }, async (err, robot) => {
     if (err) { return next(err); }
-    if (user) {
-      user.robots.forEach(async (robot) => {
-        if (robot.robot_id === messageObj.id) {
-          if (robot.account_number === messageObj.account_id) {
-            if (messageObj.transactions) {
-              const transactionsArray = messageObj.transactions.split('/');
-              transactionsArray.forEach((transaction) => {
-                // TODO check for existing transaction
-                const [orderTicket, profit, openDate, closeDate] = transaction.split('-');
-                const transactionObj = new Transaction();
-                if (transaction.split('-').length === 4) {
-                  transactionObj.robot_id = robot.robot_id;
-                  transactionObj.order_ticket = orderTicket;
-                  transactionObj.profit = profit;
-                  transactionObj.open_date = openDate;
-                  transactionObj.close_date = closeDate;
-                  transactionObj.save((err) => { if (err) { return next(err); } });
-                }
-              });
+    if (robot) {
+      if (robot.account_number === messageObj.account_id) {
+        if (messageObj.transactions) {
+          const transactionsArray = messageObj.transactions.split('/');
+          transactionsArray.forEach((transaction) => {
+            // TODO check for existing transaction
+            const [orderTicket, profit, openDate, closeDate] = transaction.split('-');
+            const transactionObj = new Transaction();
+            if (transaction.split('-').length === 4) {
+              transactionObj.robot_id = robot.robot_id;
+              transactionObj.order_ticket = orderTicket;
+              transactionObj.profit = profit;
+              transactionObj.open_date = openDate;
+              transactionObj.close_date = closeDate;
+              transactionObj.save((err) => { if (err) { return next(err); } });
             }
-
-            await Live.findOne({ robot_id: robot.robot_id }, (err, liveRobot) => {
-              if (err) { return next(err); }
-              if (liveRobot) {
-                if (liveRobot.pending_action) {
-                  const actionTime = moment(liveRobot.pending_time);
-                  const now = moment(Date.now());
-                  const secondsDiff = now.diff(actionTime, 'seconds');
-                  if (secondsDiff <= process.env.SEND_ACTION_LIMIT_TIME) {
-                    action = liveRobot.pending_action;
-                  } else {
-                    action = 'Late for action!';
-                  }
-                  liveRobot.pending_action = null;
-                  liveRobot.pending_time = null;
-                  liveRobot.last_active = Date.now();
-                  liveRobot.save((err) => { if (err) { return next(err); } });
-                }
-              } else {
-                const live = new Live();
-                live.robot_id = robot.robot_id;
-                live.symbol = robot.symbol;
-                live.last_active = Date.now();
-                live.save((err) => { if (err) { return next(err); } });
-              }
-            });
-            res.status(200).send(action);
-          } else {
-            res.status(200).send('Account is not correct!');
-          }
+          });
         }
-      });
+
+        await Live.findOne({ robot_id: robot.robot_id }, (err, liveRobot) => {
+          if (err) { return next(err); }
+          if (liveRobot) {
+            if (liveRobot.pending_action) {
+              const actionTime = moment(liveRobot.pending_time);
+              const now = moment(Date.now());
+              const secondsDiff = now.diff(actionTime, 'seconds');
+              if (secondsDiff <= process.env.SEND_ACTION_LIMIT_TIME) {
+                action = liveRobot.pending_action;
+              } else {
+                action = 'Late for action!';
+              }
+              liveRobot.pending_action = null;
+              liveRobot.pending_time = null;
+              liveRobot.last_active = Date.now();
+              liveRobot.save((err) => { if (err) { return next(err); } });
+            }
+          } else {
+            const live = new Live();
+            live.robot_id = robot.robot_id;
+            live.symbol = robot.symbol;
+            live.last_active = Date.now();
+            live.save((err) => { if (err) { return next(err); } });
+          }
+        });
+        res.status(200).send(action);
+      } else {
+        res.status(200).send('Robot is placed on different account!');
+      }
     } else {
       res.status(200).send('Not found Robot!');
     }
@@ -158,27 +153,12 @@ exports.putRobots = async (req, res, next) => {
 exports.removeRobots = (req, res, next) => {
   const { robotId } = req.params;
   console.log(robotId);
-  User.findById(req.user.id, (err, user) => {
+  Robot.remove({ robot_id: robotId }, (err) => {
     if (err) { return next(err); }
-    if (user) {
-      user.robots.forEach((robot) => {
-        if (robot.robot_id === robotId) {
-          user.robots.pull({ _id: robot.id });
-        }
-      });
-      user.save((err) => {
-        if (err) {
-          if (err.code === 11000) {
-            req.flash('errors', { msg: 'Error!' });
-            return res.redirect('/account');
-          }
-          return next(err);
-        }
-      });
-      req.flash('success', { msg: 'Your Robot has been removed!' });
-      res.redirect('/account');
-    }
   });
+
+  req.flash('success', { msg: 'Your Robot has been removed!' });
+  res.redirect('/account');
 };
 
 /**
@@ -209,13 +189,13 @@ exports.postActions = (req, res, next) => {
 
       Live.find({ symbol: messageObj.type }).then( (lives) =>{
         lives.forEach( (live) => {
-            if(live.pending_action){
-              live.pending_action = messageObj.action + '|' + live.pending_action;
-            } else {
-              live.pending_action = messageObj.action;
-            }
-            live.pending_time = Date.now();
-            live.save((err) => { if (err) { return next(err); } });
+          if (live.pending_action) {
+            live.pending_action = messageObj.action + '|' + live.pending_action;
+          } else {
+            live.pending_action = messageObj.action;
+          }
+          live.pending_time = Date.now();
+          live.save((err) => { if (err) { return next(err); } });
         });
       });
 

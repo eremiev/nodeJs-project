@@ -8,7 +8,9 @@ const robotSchema = new mongoose.Schema({
   mac: String,
   ip: String,
   symbol: String,
-}, { versionKey: false });
+  last_active: Date,
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }
+}, { timestamps: true, versionKey: false });
 
 
 const Robot = mongoose.model('robot', robotSchema);
