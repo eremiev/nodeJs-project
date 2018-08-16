@@ -7,6 +7,7 @@ const liveSchema = new mongoose.Schema({
   has_order: Boolean,
   stop_loss: Number,
   symbol: String,
+  last_active: Date
 }, { timestamps: true, versionKey: false });
 
 

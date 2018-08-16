@@ -76,7 +76,7 @@ exports.postRobots = async (req, res, next) => {
  * Update info of robot.
  */
 exports.putRobots = async (req, res, next) => {
-  let { message } = req.body;
+  const { message } = req.body;
   console.log(message);
   // message += ',transactions:123456-1.20-12.03.2018-12.03.2018/123456-1.20-12.03.2018-12.03.2018';
   const messagePreparationArray = message.split(',');
@@ -96,10 +96,6 @@ exports.putRobots = async (req, res, next) => {
       user.robots.forEach(async (robot) => {
         if (robot.robot_id === messageObj.id) {
           if (robot.account_number === messageObj.account_id) {
-            // user.robots.pull({ _id: robot.id });
-            // robot.last_active = Date.now();
-            // user.robots.push(robot);
-            // user.save((err) => { if (err) { return next(err); } });
             if (messageObj.transactions) {
               const transactionsArray = messageObj.transactions.split('/');
               transactionsArray.forEach((transaction) => {
@@ -117,7 +113,6 @@ exports.putRobots = async (req, res, next) => {
               });
             }
 
-
             await Live.findOne({ robot_id: robot.robot_id }, (err, liveRobot) => {
               if (err) { return next(err); }
               if (liveRobot) {
@@ -132,12 +127,14 @@ exports.putRobots = async (req, res, next) => {
                   }
                   liveRobot.pending_action = null;
                   liveRobot.pending_time = null;
+                  liveRobot.last_active = Date.now();
                   liveRobot.save((err) => { if (err) { return next(err); } });
                 }
               } else {
                 const live = new Live();
                 live.robot_id = robot.robot_id;
                 live.symbol = robot.symbol;
+                live.last_active = Date.now();
                 live.save((err) => { if (err) { return next(err); } });
               }
             });

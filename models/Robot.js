@@ -8,7 +8,6 @@ const robotSchema = new mongoose.Schema({
   mac: String,
   ip: String,
   symbol: String,
-  last_active: Date
 }, { versionKey: false });
 
 
