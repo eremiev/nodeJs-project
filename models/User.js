@@ -18,13 +18,11 @@ const userSchema = new mongoose.Schema({
     website: String,
     picture: String
   },
-  robots: [Robot.schema],
   commission: {
     value: Number,
     chargeType: String
   },
   role: Array
-
 }, { timestamps: true, versionKey: false });
 
 /**

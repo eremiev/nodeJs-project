@@ -71,7 +71,7 @@ exports.postRobots = async (req, res, next) => {
 
 
 /**
- * PUT /api/robots/:robot_id
+ * PUT /api/robots
  * Update info of robot.
  */
 exports.putRobots = async (req, res, next) => {
@@ -134,6 +134,8 @@ exports.putRobots = async (req, res, next) => {
             live.last_active = Date.now();
             live.save((err) => { if (err) { return next(err); } });
           }
+            robot.last_active = Date.now();
+            robot.save((err) => { if (err) { return next(err); } });
         });
         res.status(200).send(action);
       } else {
@@ -152,7 +154,6 @@ exports.putRobots = async (req, res, next) => {
  */
 exports.removeRobots = (req, res, next) => {
   const { robotId } = req.params;
-  console.log(robotId);
   Robot.remove({ robot_id: robotId }, (err) => {
     if (err) { return next(err); }
   });
