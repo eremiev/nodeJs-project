@@ -94,18 +94,21 @@ exports.putRobots = async (req, res, next) => {
         if (messageObj.transactions) {
           const transactionsArray = messageObj.transactions.split('/');
           transactionsArray.forEach((transaction) => {
-            // TODO check for existing transaction
             const [orderTicket, profit, openDate, closeDate] = transaction.split('|');
-            const transactionObj = new Transaction();
-            if (transaction.split('|').length === 4) {
-              transactionObj.robot_id = robot.robot_id;
-              transactionObj.order_ticket = orderTicket;
-              transactionObj.profit = profit;
-              transactionObj.open_date = openDate;
-              transactionObj.close_date = closeDate;
-              console.log(transactionObj);
-              transactionObj.save((err) => { if (err) { return next(err); } });
-            }
+
+            Transaction.findOne({ order_ticket: orderTicket }, (err, hasTransaction) => {
+                if(!hasTransaction){
+                  const transactionObj = new Transaction();
+                  if (transaction.split('|').length === 4) {
+                    transactionObj.robot_id = robot.robot_id;
+                    transactionObj.order_ticket = orderTicket;
+                    transactionObj.profit = profit;
+                    transactionObj.open_date = openDate;
+                    transactionObj.close_date = closeDate;
+                    transactionObj.save((err) => { if (err) { return next(err); } });
+                  }
+                }
+            });
           });
         }
 
