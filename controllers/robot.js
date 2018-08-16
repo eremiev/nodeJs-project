@@ -3,6 +3,7 @@ const User = require('../models/User');
 const RobotAction = require('../models/RobotAction');
 const Robot = require('../models/Robot');
 const Live = require('../models/Live');
+const Transaction = require('../models/Transaction');
 
 
 /**
@@ -75,8 +76,9 @@ exports.postRobots = async (req, res, next) => {
  * Update info of robot.
  */
 exports.putRobots = async (req, res, next) => {
-  const { message } = req.body;
+  let { message } = req.body;
   console.log(message);
+  // message += ',transactions:123456-1.20-12.03.2018-12.03.2018/123456-1.20-12.03.2018-12.03.2018';
   const messagePreparationArray = message.split(',');
   const messageObj = {};
   messagePreparationArray.forEach((element) => {
@@ -98,7 +100,24 @@ exports.putRobots = async (req, res, next) => {
             // robot.last_active = Date.now();
             // user.robots.push(robot);
             // user.save((err) => { if (err) { return next(err); } });
-            
+            if (messageObj.transactions) {
+              const transactionsArray = messageObj.transactions.split('/');
+              transactionsArray.forEach((transaction) => {
+                // TODO check for existing transaction
+                const [orderTicket, profit, openDate, closeDate] = transaction.split('-');
+                const transactionObj = new Transaction();
+                if (transaction.split('-').length === 4) {
+                  transactionObj.robot_id = robot.robot_id;
+                  transactionObj.order_ticket = orderTicket;
+                  transactionObj.profit = profit;
+                  transactionObj.open_date = openDate;
+                  transactionObj.close_date = closeDate;
+                  transactionObj.save((err) => { if (err) { return next(err); } });
+                }
+              });
+            }
+
+
             await Live.findOne({ robot_id: robot.robot_id }, (err, liveRobot) => {
               if (err) { return next(err); }
               if (liveRobot) {
@@ -128,8 +147,6 @@ exports.putRobots = async (req, res, next) => {
           }
         }
       });
-
-
     } else {
       res.status(200).send('Not found Robot!');
     }
