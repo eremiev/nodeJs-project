@@ -76,8 +76,6 @@ exports.postRobots = async (req, res, next) => {
  */
 exports.putRobots = async (req, res, next) => {
   const { message } = req.body;
-  console.log(message);
-  // message += ',transactions:123456-1.20-12.03.2018-12.03.2018/123456-1.20-12.03.2018-12.03.2018';
   const messagePreparationArray = message.split(',');
   const messageObj = {};
   messagePreparationArray.forEach((element) => {
@@ -97,14 +95,15 @@ exports.putRobots = async (req, res, next) => {
           const transactionsArray = messageObj.transactions.split('/');
           transactionsArray.forEach((transaction) => {
             // TODO check for existing transaction
-            const [orderTicket, profit, openDate, closeDate] = transaction.split('-');
+            const [orderTicket, profit, openDate, closeDate] = transaction.split('|');
             const transactionObj = new Transaction();
-            if (transaction.split('-').length === 4) {
+            if (transaction.split('|').length === 4) {
               transactionObj.robot_id = robot.robot_id;
               transactionObj.order_ticket = orderTicket;
               transactionObj.profit = profit;
               transactionObj.open_date = openDate;
               transactionObj.close_date = closeDate;
+              console.log(transactionObj);
               transactionObj.save((err) => { if (err) { return next(err); } });
             }
           });
