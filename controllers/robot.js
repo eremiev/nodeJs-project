@@ -94,7 +94,7 @@ exports.putRobots = async (req, res, next) => {
         if (messageObj.transactions) {
           const transactionsArray = messageObj.transactions.split('/');
           transactionsArray.forEach((transaction) => {
-            const [orderTicket, profit, commission, openDate, closeDate] = transaction.split('|');
+            const [orderTicket, profit, openDate, closeDate] = transaction.split('|');
 
             Transaction.findOne({ order_ticket: orderTicket }, (err, hasTransaction) => {
                 if(!hasTransaction){
@@ -103,7 +103,6 @@ exports.putRobots = async (req, res, next) => {
                     transactionObj.robot_id = robot.robot_id;
                     transactionObj.order_ticket = orderTicket;
                     transactionObj.profit = profit;
-                    transactionObj.commission = commission;
                     transactionObj.open_date = openDate;
                     transactionObj.close_date = closeDate;
                     transactionObj.save((err) => { if (err) { return next(err); } });

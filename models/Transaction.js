@@ -4,7 +4,6 @@ const transactionSchema = new mongoose.Schema({
   robot_id: String,
   order_ticket: Number,
   profit: Number,
-  commission: Number,
   open_date: Date,
   close_date: Date,
 }, { timestamps: true, versionKey: false });
